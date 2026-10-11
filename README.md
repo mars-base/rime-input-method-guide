@@ -1,7 +1,7 @@
 # Debian 系统 fcitx5 + Rime 输入法配置指南
 
-> 在 Debian GNU/Linux + GNOME Wayland 环境下配置 fcitx5 输入法框架 + Rime 雾凇拼音方案的完整记录。
-> 涵盖环境变量、自启动、候选词设置、深色主题、ibus 清理等，已在 Debian 12 上验证可用。
+> 在 Debian GNU/Linux (12/13) + GNOME Wayland 环境下配置 fcitx5 输入法框架 + Rime 雾凇拼音方案的完整记录。
+> 涵盖环境变量、自启动、候选词设置、深色主题、ibus 清理等，已在 Debian 12 和 Debian 13 上验证可用。
 
 ---
 
@@ -31,7 +31,7 @@
 
 | 项 | 值 | 判定方法 |
 |---|---|---|
-| 发行版 | Debian 12 (bookworm) | `cat /etc/os-release` |
+| 发行版 | Debian 12 (bookworm) / Debian 13 (trixie) | `cat /etc/os-release` |
 | 桌面 | GNOME | `dpkg -s gnome-shell` |
 | 会话类型 | Wayland（也兼容 X11） | `loginctl show-session <id> -p Type` |
 
