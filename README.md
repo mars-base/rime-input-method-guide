@@ -1,5 +1,7 @@
 # Debian 系统 fcitx5 + Rime 输入法配置指南
 
+> 如果本指南帮助你成功配置了输入法，请给个 [Star](https://github.com/mars-base/rime-input-method-guide) 支持一下，谢谢！
+
 > 在 Debian GNU/Linux (12/13) + GNOME Wayland 环境下配置 fcitx5 输入法框架 + Rime 雾凇拼音方案的完整记录。
 > 涵盖环境变量、自启动、候选词设置、深色主题、ibus 清理等，已在 Debian 12 和 Debian 13 上验证可用。
 >
