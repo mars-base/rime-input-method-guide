@@ -2,6 +2,10 @@
 
 > 在 Debian GNU/Linux (12/13) + GNOME Wayland 环境下配置 fcitx5 输入法框架 + Rime 雾凇拼音方案的完整记录。
 > 涵盖环境变量、自启动、候选词设置、深色主题、ibus 清理等，已在 Debian 12 和 Debian 13 上验证可用。
+>
+> 其他 Linux 发行版（Ubuntu、Fedora、Arch Linux、openSUSE 等）的配置流程类似，
+> 主要区别在于包管理器（`apt` / `dnf` / `pacman` / `zypper`）和包名。
+> 环境变量、fcitx5 配置文件、Rime 方案配置等用户级配置完全通用。
 
 ---
 
@@ -73,15 +77,37 @@ sudo apt install ibus ibus-libpinyin ibus-data ibus-gtk ibus-gtk3 ibus-gtk4 \
 
 ## 3. 安装 fcitx5
 
+### Debian / Ubuntu
+
 ```bash
 sudo apt install fcitx5 fcitx5-rime fcitx5-frontend-gtk3 fcitx5-frontend-gtk4 \
                 fcitx5-frontend-qt5 fcitx5-config-qt
 sudo apt install git    # 用于 clone 词库
 ```
 
-- `fcitx5-rime` 会拉入 `librime` + `rime-data-*` 等依赖
-- `fcitx5-config-qt` 提供图形化配置工具（可选）
-- 各 frontend 包确保 GTK3/GTK4/Qt5 应用都能走 fcitx5
+### Fedora
+
+```bash
+sudo dnf install fcitx5 fcitx5-rime fcitx5-gtk fcitx5-qt fcitx5-configtool git
+```
+
+### Arch Linux
+
+```bash
+sudo pacman -S fcitx5 fcitx5-rime fcitx5-gtk fcitx5-qt fcitx5-configtool git
+```
+
+### openSUSE
+
+```bash
+sudo zypper install fcitx5 fcitx5-rime fcitx5-gtk3 fcitx5-qt5 git
+```
+
+> **说明**：
+> - `fcitx5-rime` 会拉入 `librime` + `rime-data-*` 等依赖
+> - `fcitx5-config-qt` / `fcitx5-configtool` 提供图形化配置工具（可选）
+> - 各 frontend 包确保 GTK3/GTK4/Qt5 应用都能走 fcitx5
+> - 安装后**不要**立即启动 fcitx5，先完成下面的配置文件设置
 
 ---
 
