@@ -8,18 +8,18 @@
 ## 目录
 
 - [1. 适用环境](#1-适用环境)
-- [2. 安装](#2-安装)
-- [3. 配置文件](#3-配置文件)
-  - [3.1 指定输入法框架](#31-xinputrc--指定输入法框架)
-  - [3.2 会话环境变量](#32-configenvironmentdfcitx5conf--会话环境变量)
-  - [3.3 自启动](#33-configautostartorgfcitxfcrct5desktop--自启动)
-  - [3.4 输入法组配置](#34-configfcitx5profile--把-rime-加入输入法组)
-  - [3.5 GTK 注入](#35-gtk-注入gsettings)
-  - [3.6 候选窗口深色主题](#36-候选窗口深色主题nord-dark)
-- [4. 雾凇拼音（rime-ice）](#4-雾凇拼音rime-ice)
-  - [4.1 候选词个数](#41-候选词个数5--9)
-  - [4.2 简繁输出](#42-简繁输出)
-- [5. ibus 清理](#5-ibus-清理)
+- [2. ibus 清理](#2-ibus-清理)
+- [3. 安装 fcitx5](#3-安装-fcitx5)
+- [4. 配置文件](#4-配置文件)
+  - [4.1 指定输入法框架](#41-xinputrc--指定输入法框架)
+  - [4.2 会话环境变量](#42-configenvironmentdfcitx5conf--会话环境变量)
+  - [4.3 自启动](#43-configautostartorgfcitxfcrct5desktop--自启动)
+  - [4.4 输入法组配置](#44-configfcitx5profile--把-rime-加入输入法组)
+  - [4.5 GTK 注入](#45-gtk-注入gsettings)
+  - [4.6 候选窗口深色主题](#46-候选窗口深色主题nord-dark)
+- [5. 雾凇拼音（rime-ice）](#5-雾凇拼音rime-ice)
+  - [5.1 候选词个数](#51-候选词个数5--9)
+  - [5.2 简繁输出](#52-简繁输出)
 - [6. 生效方式](#6-生效方式注销重登必须)
 - [7. 日常使用与维护](#7-日常使用--维护)
 - [8. 回滚](#8-回滚)
@@ -46,7 +46,32 @@
 
 ---
 
-## 2. 安装
+## 2. ibus 清理
+
+Debian GNOME 默认预装 ibus，会抢占输入法协议导致 fcitx5 冲突。建议先清理：
+
+```bash
+sudo apt purge -y ibus ibus-libpinyin ibus-gtk ibus-gtk3 ibus-gtk4 \
+                    ibus-data python3-ibus-1.0
+```
+
+> **注意**：
+> - **保留** `gir1.2-ibus-1.0` + `libibus-1.0-5`：这是 `gnome-shell` 的**硬依赖**
+> - `apt-get -s autoremove` 确认不涉及 gnome / gdm3 / nautilus 后再执行 autoremove
+
+> 残留的旧 fcitx4 栈（`fcitx`、`fcitx-bin`、`fcitx-modules` 等）在 fcitx5 下已无用，
+> 属 auto-installed 孤儿。清理时注意 `apt autoremove` 不要误删其他包的依赖。
+
+如需恢复 ibus：
+
+```bash
+sudo apt install ibus ibus-libpinyin ibus-data ibus-gtk ibus-gtk3 ibus-gtk4 \
+                 python3-ibus-1.0
+```
+
+---
+
+## 3. 安装 fcitx5
 
 ```bash
 sudo apt install fcitx5 fcitx5-rime fcitx5-frontend-gtk3 fcitx5-frontend-gtk4 \
@@ -60,11 +85,11 @@ sudo apt install git    # 用于 clone 词库
 
 ---
 
-## 3. 配置文件
+## 4. 配置文件
 
 全部为用户级配置，不需要改动 `/etc`。
 
-### 3.1 `~/.xinputrc` — 指定输入法框架
+### 4.1 `~/.xinputrc` — 指定输入法框架
 
 ```bash
 im-config -n fcitx5
@@ -76,7 +101,7 @@ im-config -n fcitx5
 run_im fcitx5
 ```
 
-### 3.2 `~/.config/environment.d/fcitx5.conf` — 会话环境变量
+### 4.2 `~/.config/environment.d/fcitx5.conf` — 会话环境变量
 
 ```bash
 mkdir -p ~/.config/environment.d
@@ -91,7 +116,7 @@ EOF
 > **说明**：Wayland 会话由 systemd user manager 读取 `environment.d/`，
 > `/etc/profile.d` 那套对图形会话无效，所以必须放这里。
 
-### 3.3 `~/.config/autostart/org.fcitx.Fcitx5.desktop` — 自启动
+### 4.3 `~/.config/autostart/org.fcitx.Fcitx5.desktop` — 自启动
 
 ```bash
 cp /usr/share/applications/org.fcitx.Fcitx5.desktop ~/.config/autostart/
@@ -102,7 +127,7 @@ cp /usr/share/applications/org.fcitx.Fcitx5.desktop ~/.config/autostart/
 > X11 下 im-config 会通过 `/etc/X11/Xsession.d/70im-config_launch` 启动它，
 > Wayland 下没有这条路径。
 
-### 3.4 `~/.config/fcitx5/profile` — 把 Rime 加入输入法组
+### 4.4 `~/.config/fcitx5/profile` — 把 Rime 加入输入法组
 
 fcitx5 **不会**自动把新装的引擎加进默认组，需要手工追加：
 
@@ -133,13 +158,13 @@ Layout=
 
 也可以通过 `fcitx5-configtool` 图形界面添加。
 
-### 3.5 GTK 注入（gsettings）
+### 4.5 GTK 注入（gsettings）
 
 ```bash
 gsettings set org.gnome.desktop.interface gtk-im-module 'fcitx'
 ```
 
-### 3.6 候选窗口深色主题（Nord-Dark）
+### 4.6 候选窗口深色主题（Nord-Dark）
 
 fcitx5 的候选窗口默认白底，可通过 classicui 主题改为深色。
 
@@ -182,7 +207,7 @@ EOF
 
 ---
 
-## 4. 雾凇拼音（rime-ice）
+## 5. 雾凇拼音（rime-ice）
 
 [雾凇拼音](https://github.com/iDvel/rime-ice) 是一套开箱即用的 Rime 配置方案，
 默认全拼，词库丰富，支持多种双拼方案。
@@ -203,7 +228,7 @@ fcitx5-remote -e && setsid fcitx5 -d >/dev/null 2>&1 < /dev/null &
 默认方案：雾凇拼音全拼（**默认输出简体**），附带各种双拼方案
 （自然码 / ABC / 微软 / 搜狗 / 小鹤 / 紫光 / 加加）、t9 九键、melt_eng、radical_pinyin。
 
-### 4.1 候选词个数（5 → 9）
+### 5.1 候选词个数（5 → 9）
 
 候选个数由 rime 方案的 `menu/page_size` 决定，**不是** fcitx5 的设置 ——
 fcitx5 只负责渲染 rime 给出的候选。rime-ice 把 `page_size: 5` 写死在 `default.yaml` 里。
@@ -223,7 +248,7 @@ patch:
 - 改完重启 fcitx5 即生效，不需要重新登录
 - 验证：`grep -A2 '^menu:' ~/.local/share/fcitx5/rime/build/default.yaml` → 应为 `page_size: 9`
 
-### 4.2 简繁输出
+### 5.2 简繁输出
 
 `rime_ice.schema.yaml` 的 `traditionalization` switch 只定义了 `states: [简, 繁]`，
 **没有 `reset`**，按 rime 规则取第一态 → **默认简体**。
@@ -239,31 +264,6 @@ patch:
 > 用下标 patch 可以只覆盖这一个字段，不会把整个 `switches` 列表替换掉。
 
 临时切换仍可用 `F4` 菜单。
-
----
-
-## 5. ibus 清理
-
-如果系统原来装了 ibus（Debian 默认可能预装），建议清理以避免冲突：
-
-```bash
-sudo apt purge -y ibus ibus-libpinyin ibus-gtk ibus-gtk3 ibus-gtk4 \
-                    ibus-data python3-ibus-1.0
-```
-
-> **注意**：
-> - **保留** `gir1.2-ibus-1.0` + `libibus-1.0-5`：这是 `gnome-shell` 的**硬依赖**
-> - `apt-get -s autoremove` 确认不涉及 gnome / gdm3 / nautilus 后再执行 autoremove
-
-如需恢复：
-
-```bash
-sudo apt install ibus ibus-libpinyin ibus-data ibus-gtk ibus-gtk3 ibus-gtk4 \
-                 python3-ibus-1.0
-```
-
-> 残留的旧 fcitx4 栈（`fcitx`、`fcitx-bin`、`fcitx-modules` 等）在 fcitx5 下已无用，
-> 属 auto-installed 孤儿。清理时注意 `apt autoremove` 不要误删其他包的依赖。
 
 ---
 
