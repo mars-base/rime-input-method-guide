@@ -34,6 +34,7 @@
 - [7. 日常使用与维护](#7-日常使用--维护)
 - [8. 回滚](#8-回滚)
 - [9. 已知限制](#9-已知限制)
+  - [9.1 终端 TUI 看不到输入的拼音字母](#91-终端-tui-看不到输入的拼音字母)
 
 ---
 
@@ -364,6 +365,27 @@ rm ~/.config/autostart/org.fcitx.Fcitx5.desktop
 2. GTK3 / Qt / Electron / Xwayland 应用正常。
 3. `ibus` 包已移除时，GNOME「设置 → 键盘 → 输入源」界面可能报错或不再列出引擎；
    xkb 键盘布局本身由 mutter 处理，不受影响。
+4. **终端里（GTK 终端 + TUI 程序）输入拼音时看不到字母，只弹候选词** —— 见下方 9.1。
+
+### 9.1 终端 TUI 看不到输入的拼音字母
+
+**症状**：在 Guake / GNOME Terminal 等 GTK 终端里跑 vim、htop、Claude Code 这类全屏 TUI 程序，
+用 rime 打拼音时**字母不显示**（或只在 TUI 不重绘时闪一下），只剩候选词浮窗；换到普通 GUI 程序或
+非 GTK 终端（如 Warp）则正常。
+
+**原因**：fcitx5-rime 插件默认 `PreeditInApplication=True`（"行内显示输入码"），即把拼音字母
+`nihao` 交给应用自己在光标处画。TUI 程序不走 GTK 输入面板协议、且自己接管整屏重绘，于是收到的
+行内码被它覆盖掉 → 字母丢失。候选词是 fcitx 自绘的独立浮窗，不受影响，所以照常显示。
+
+**解决**：关掉行内输入码，让字母改由候选浮窗显示：
+
+```bash
+echo 'PreeditInApplication=False' > ~/.config/fcitx5/conf/rime.conf
+fcitx5-remote -r   # 或重启 fcitx5
+```
+
+代价：GUI 程序（浏览器、编辑器）里字母也不再出现在光标处，统一显示在候选窗上方。若只想保留
+终端场景修复、GUI 维持行内显示，没有干净的按应用区分办法，一般直接全局关即可。
 
 ---
 
